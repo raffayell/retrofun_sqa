@@ -5,6 +5,7 @@ from models import Product
 #Chapter 2 Database tables
 class Chapter2:
 
+    @staticmethod
     def database_tables_1():
         """
         The first three products in alphabetical order built in the year 1983
@@ -18,7 +19,8 @@ class Chapter2:
                     )
                 res = session.scalars(q).all()
                 print(res)
-        
+
+    @staticmethod
     def database_tables_2():
         """
         Products that use the "Z80" CPU or any of its clones. Assume that all
@@ -32,6 +34,7 @@ class Chapter2:
                 res = session.scalars(q).all()
                 print(res)
 
+    @staticmethod
     def database_tables_3():
         """
         Products that use either the "Z80" or the "6502" CPUs, or any of its
@@ -52,6 +55,7 @@ class Chapter2:
                 for r in res:
                     print(r)
 
+    @staticmethod
     def database_tables_4():
         """
         The manufacturers that built products in the 1980s.
@@ -64,7 +68,8 @@ class Chapter2:
                      )
                 res = session.scalars(q).all()
                 print(res)
-                
+
+    @staticmethod
     def database_tables_5():
         """
         Manufacturers whose names start with the letter "T", sorted
@@ -80,6 +85,7 @@ class Chapter2:
                 res = session.scalars(q).all()
                 print(res)
 
+    @staticmethod
     def database_tables_6():
         """
         The first and last years in which products have been built in Croatia,
@@ -104,7 +110,8 @@ class Chapter2:
                 res = session.execute(q).first()
                 print(q)
                 print(res)
-                
+
+    @staticmethod
     def database_tables_7():
         """
         The number of products that were built each year. The results should
@@ -121,8 +128,9 @@ class Chapter2:
                      )
                 res = session.execute(q).all()
                 print(res)
-                print(len(res))  
+                print(len(res))
 
+    @staticmethod
     def database_tables_8():
         """
         The number of manufacturers in the United States (note that the
@@ -138,7 +146,7 @@ class Chapter2:
                 #        .having(Product.country == "USA")
                 #     )
                 res = session.scalar(q)
-                print(res)
+            return res
                 
 
 
@@ -151,4 +159,4 @@ if __name__ == "__main__":
     #Chapter2.database_tables_5()
     #Chapter2.database_tables_6()
     #Chapter2.database_tables_7()
-    Chapter2.database_tables_8()
+    assert Chapter2.database_tables_8() == 17
