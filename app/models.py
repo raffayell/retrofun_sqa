@@ -1,7 +1,7 @@
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .db import Model
+from db import Model
 
 class Manufacturer(Model):
     __tablename__ = "manufacturers"

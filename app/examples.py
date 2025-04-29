@@ -1,6 +1,6 @@
 from sqlalchemy import select, or_, func
 from db import Session
-from models import Product
+from models import Product, Manufacturer
 
 #Chapter 2 Database tables
 class Chapter2:
@@ -148,8 +148,39 @@ class Chapter2:
                 res = session.scalar(q)
             return res
                 
+#Chapter 3 One-To-Many Relationship
+class Chapter3:
 
+    @staticmethod
+    def one_to_many_1():
+        """
+        The list of products made by IBM and Texas Instruments.
+        """
+        with Session() as session:
+            with session.begin():
+                q = (
+                    select(Product)
+                        .join(Manufacturer)
+                            .where(
+                                or_(
+                                    Manufacturer.name == "IBM",
+                                    Manufacturer.name == "Texas Instruments"
+                                )
+                            )
+                )
+                res = session.scalars(q).all()
+                print(res)
 
+    @staticmethod
+    def one_to_many_2():
+        """
+        Manufacturers that operate in Brazil.
+        """
+        with Session() as session:
+            with session.begin():
+                q = select(Manufacturer).join(Product).where(Product.country == "Brazil").distinct()
+                res = session.scalars(q).all()
+                print(res)
 
 if __name__ == "__main__":
     #Chapter2.database_tables_1()
@@ -159,4 +190,5 @@ if __name__ == "__main__":
     #Chapter2.database_tables_5()
     #Chapter2.database_tables_6()
     #Chapter2.database_tables_7()
-    assert Chapter2.database_tables_8() == 17
+    #Chapter3.one_to_many_1()
+    Chapter3.one_to_many_2()
