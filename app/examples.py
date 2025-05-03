@@ -1,4 +1,6 @@
-from sqlalchemy import select, or_, func
+from pprint import pprint
+
+from sqlalchemy import select, or_, func, not_
 from db import Session
 from models import Product, Manufacturer
 
@@ -182,13 +184,104 @@ class Chapter3:
                 res = session.scalars(q).all()
                 print(res)
 
+    @staticmethod
+    def one_to_many_3():
+        """
+        Products that have a manufacturer that has the word "Research" in their name.
+        """
+        with Session() as session:
+            with session.begin():
+                # q = select(Product).join(Product.manufacturer).where(Manufacturer.name.contains("Research"))
+                q = select(Product)\
+                        .join(Product.manufacturer)\
+                        .where(Manufacturer.name.like("%Research%"))
+                res = session.scalars(q).all()
+                pprint(res)
+
+    @staticmethod
+    def one_to_many_4():
+        """
+        Manufacturers that made products based on the Z80 CPU or any of its clones.
+        """
+        with Session() as session:
+            with session.begin():
+                q = select(Manufacturer).join(Product).where(Product.cpu.like("%Z80%")).distinct()
+                res = session.scalars(q).all()
+                pprint(res)
+
+    @staticmethod
+    def one_to_many_5():
+        """
+        Manufacturers that made products that are not based on the 6502 CPU or any of its clones.
+        """
+        with Session() as session:
+            with session.begin():
+                q = select(Manufacturer)\
+                        .join(Manufacturer.products)\
+                        .where(not_(Product.cpu.like("%6502%")))\
+                        .distinct()
+                res = session.scalars(q).all()
+                pprint(len(res))
+
+    @staticmethod
+    def one_to_many_6():
+        """
+        Manufacturers and the year they went to market with their first product, sorted by the year.
+        """
+        with Session() as session:
+            with session.begin():
+                first_year = func.min(Product.year).label(None)
+                q = (select(Manufacturer, first_year)
+                     .join(Manufacturer.products)
+                     .group_by(Manufacturer)
+                     .order_by(first_year))
+                # q = select(Manufacturer, Product.year)\
+                #         .join(Manufacturer.products)\
+                #         .group_by(Manufacturer)\
+                #         .having(func.min(Product.year))\
+                #         .order_by(Product.year)
+                res = session.execute(q).all()
+                pprint(len(res))
+
+    @staticmethod
+    def one_to_many_7():
+        """
+        Manufacturers that have 3 to 5 products in the catalog.
+        """
+        with Session() as session:
+            with session.begin():
+                q = select(Manufacturer).join(Product).group_by(Manufacturer).having(func.count(Product.id).between(3,5))
+                res = session.scalars(q).all()
+                pprint(len(res))
+                pprint(res)
+
+    @staticmethod
+    def one_to_many_8():
+        """
+        Manufacturers that operated for more than 5 years
+        """
+        with Session() as session:
+            with session.begin():
+                min_year = func.min(Product.year).label(None)
+                max_year = func.max(Product.year).label(None)
+                q = select(Manufacturer).join(Product).group_by(Manufacturer).having((max_year - min_year) > 5)
+                res = session.scalars(q).all()
+                pprint(len(res))
+                pprint(res)
+
 if __name__ == "__main__":
-    #Chapter2.database_tables_1()
-    #Chapter2.database_tables_2()
-    #Chapter2.database_tables_3()
-    #Chapter2.database_tables_4()
-    #Chapter2.database_tables_5()
-    #Chapter2.database_tables_6()
-    #Chapter2.database_tables_7()
-    #Chapter3.one_to_many_1()
-    Chapter3.one_to_many_2()
+    # Chapter2.database_tables_1()
+    # Chapter2.database_tables_2()
+    # Chapter2.database_tables_3()
+    # Chapter2.database_tables_4()
+    # Chapter2.database_tables_5()
+    # Chapter2.database_tables_6()
+    # Chapter2.database_tables_7()
+    # Chapter3.one_to_many_1()
+    # Chapter3.one_to_many_2()
+    # Chapter3.one_to_many_3()
+    # Chapter3.one_to_many_4()
+    # Chapter3.one_to_many_5()
+    # Chapter3.one_to_many_6()
+    # Chapter3.one_to_many_7()
+    Chapter3.one_to_many_8()
